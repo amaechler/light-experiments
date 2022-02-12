@@ -1,80 +1,71 @@
-import { app, BrowserWindow } from 'electron'
-import type { BrowserWindowConstructorOptions } from 'electron'
-import contextMenu from 'electron-context-menu'
-import windowStateKeeper from 'electron-window-state'
-import { getTwConfig, getTwConfigPath } from '@twstyled/util'
+import { app, BrowserWindow } from "electron";
+import type { BrowserWindowConstructorOptions } from "electron";
+import path from "path";
 
-const resolvedTailwindConfig = getTwConfig(getTwConfigPath())
-
-const isDevelopment = !app.isPackaged
+const isDevelopment = !app.isPackaged;
 
 function createWindow() {
-  const windowOptions: BrowserWindowConstructorOptions = {
-    minWidth: 800,
-    minHeight: 600,
-    backgroundColor: resolvedTailwindConfig.theme.colors.primary[800],
-    titleBarStyle: 'hidden',
-    autoHideMenuBar: true,
-    trafficLightPosition: {
-      x: 20,
-      y: 32
-    },
-    webPreferences: {
-      contextIsolation: true,
-      devTools: isDevelopment,
-      spellcheck: false,
-      nodeIntegration: true
-    },
-    show: false
-  }
+    const mainWindow = new BrowserWindow({
+        minWidth: 800,
+        minHeight: 600,
+        webPreferences: {
+            preload: path.join(__dirname, "preload.js")
+        }
+    });
 
-  contextMenu({
-    showSearchWithGoogle: false,
-    showCopyImage: false,
-    prepend: (defaultActions, params, browserWindow) => [
-      {
-        label: 'its like magic 💥'
-      }
-    ]
-  })
+    // window.addEventListener("contextmenu", e => {
+    //     e.preventDefault();
+    //     ipcRenderer.send("show-context-menu");
+    // });
 
-  const windowState = windowStateKeeper({
-    defaultWidth: windowOptions.minWidth,
-    defaultHeight: windowOptions.minHeight
-  })
+    // ipcRenderer.on("context-menu-command", (e, command) => {
+    //     // ...
+    // });
 
-  const browserWindow = new BrowserWindow({
-    ...windowOptions,
-    x: windowState.x,
-    y: windowState.y,
-    width: windowState.width,
-    height: windowState.height
-  })
+    // contextMenu({
+    //     showSearchWithGoogle: false,
+    //     showCopyImage: false,
+    //     prepend: (defaultActions, params, browserWindow) => [
+    //         {
+    //             label: "its like magic 💥"
+    //         }
+    //     ]
+    // });
 
-  windowState.manage(browserWindow)
+    mainWindow.once("ready-to-show", () => {
+        mainWindow.show();
+        mainWindow.focus();
+    });
 
-  browserWindow.once('ready-to-show', () => {
-    browserWindow.show()
-    browserWindow.focus()
-  })
-
-  const port = process.env.PORT || 3000
-
-  if (isDevelopment) {
-    void browserWindow.loadURL(`http://localhost:${port}`)
-  } else {
-    void browserWindow.loadFile('./index.html')
-  }
+    if (isDevelopment) {
+        const port = process.env.PORT || 3000;
+        void mainWindow.loadURL(`http://localhost:${port}`);
+    } else {
+        void mainWindow.loadFile("./index.html");
+    }
 }
 
-void app.whenReady().then(createWindow)
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on("ready", () => {
+    createWindow();
 
-app.on('window-all-closed', () => {
-  app.quit()
-})
+    app.on("activate", function () {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+});
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-})
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
+});
+
+// In this file you can include the rest of your app"s specific main process
+// code. You can also put them in separate files and require them here.

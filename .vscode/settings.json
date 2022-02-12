@@ -1,27 +1,22 @@
 {
-  "search.useIgnoreFiles": false,
-  "search.exclude": {
-      "**/.next": true,
-      "**/build": true,
-      "**/node_modules": true,
-      "**/out": true,
-      "**/script.js": true,
-      "**/*-cache": true,
-      "**/dist": true,
-      "yarn.lock": true,
-      "**/*.mdx": true
-  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
   "editor.formatOnSave": false,
-  "editor.codeActionsOnSaveTimeout": 6000,
-  "css.lint.unknownAtRules": "ignore",
-  "eslint.options": {
-    "configFile": "./.config/.eslintrc.js"
+
+  "search.useIgnoreFiles": false,
+  "search.exclude": {
+    "**/build": true,
+    "**/node_modules": true,
+    "**/dist": true
   },
-  "eslint.lintTask.options": "-c ${workspaceRoot}/.config/.eslintrc.js --ext .ts,.js,.tsx .",
-  "eslint.lintTask.enable": true, 
+
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.alwaysShowStatus": true,
+
+  // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+  "typescript.tsc.autoDetect": "off",
+
   "[javascript]": {
     "editor.formatOnSave": true
   },
@@ -35,22 +30,6 @@
     "editor.formatOnSave": false
   },
   "[json]": {
-    "editor.formatOnSave": true   
-  },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
-  "eslint.alwaysShowStatus": true,
-  "files.eol": "\n",
-  // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-  "typescript.tsc.autoDetect": "off",
-  "tailwindCSS.includeLanguages": {
-    "plaintext": "html",
-    "javascript": "javascriptreact",
-    "typescript": "javascript",
-    "typescriptreact": "javascriptreact"
+    "editor.formatOnSave": true
   }
 }
